@@ -7,8 +7,8 @@ const usersRepositoryFactory = (db: Db): UsersRepository => {
   const users = db.collection(USERS_COLLECTION);
 
   return {
-    async findOne(username) {
-      return users.findOne({ username }, { projection: { _id: 0 } });
+    async findOne(email) {
+      return users.findOne({ email }, { projection: { _id: 0 } });
     },
     async findByRefreshToken(token) {
       return users.findOne({ token }, { projection: { _id: 0, password: 0 } });
@@ -21,12 +21,12 @@ const usersRepositoryFactory = (db: Db): UsersRepository => {
     async create(credentials) {
       await users.insertOne(credentials);
     },
-    async updateOne(username, updateData) {
+    async updateOne(email, updateData) {
       const updateDoc = {
         $set: updateData,
       };
 
-      await users.updateOne({ username }, updateDoc);
+      await users.updateOne({ email }, updateDoc);
     },
   };
 };
