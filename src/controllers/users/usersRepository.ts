@@ -1,8 +1,10 @@
 import { Db } from "mongodb";
 import { UsersRepository } from "../../models/user";
 
+const USERS_COLLECTION = "users_zz";
+
 const usersRepositoryFactory = (db: Db): UsersRepository => {
-  const users = db.collection("users");
+  const users = db.collection(USERS_COLLECTION);
 
   return {
     async findOne(username) {
