@@ -1,34 +1,32 @@
-import { Db } from "mongodb";
-import { UsersRepository } from "../../models/user";
+import { Db, ObjectId } from "mongodb";
+import { User, UsersRepository } from "../../models/user";
 
 const USERS_COLLECTION = "users_zz";
-const AUTH_USERS_COLLECTION = "auth_users_zz";
 
 const usersRepositoryFactory = (db: Db): UsersRepository => {
   const users = db.collection(USERS_COLLECTION);
-  const auth_users = db.collection(AUTH_USERS_COLLECTION);
 
   return {
-    async findOne(email, username) {
-      return users.findOne({ email, username }, { projection: { _id: 0 } });
-    },
-    async findByRefreshToken(token) {
-      return users.findOne({ token }, { projection: { _id: 0, password: 0 } });
+    async findOne(_id: string) {
+      return users.findOne({ _id });
     },
     async findAll() {
       return users
         .find({}, { projection: { _id: 0, password: 0, token: 0 } })
         .toArray();
     },
-    async create(credentials) {
-      await users.insertOne(credentials);
+    async create(id, userData) {
+      await users.insertOne({ ...userData, _id: new ObjectId(id) });
     },
-    async updateOne(email, updateData) {
+    async updateOne(_id, updateData) {
       const updateDoc = {
         $set: updateData,
       };
 
-      await users.updateOne({ email }, updateDoc);
+      await users.updateOne({ _id }, updateDoc);
+    },
+    async delete(id) {
+      return users.deleteOne({ _id: new ObjectId(id) });
     },
   };
 };

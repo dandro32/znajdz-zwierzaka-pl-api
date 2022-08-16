@@ -1,6 +1,6 @@
-import { WithId, Document } from "mongodb";
+import { WithId, Document, DeleteResult } from "mongodb";
 
-export interface UserAddress {
+export interface UserContact {
   city?: string;
   phone?: string;
   postalCode?: string;
@@ -9,16 +9,15 @@ export interface UserAddress {
 
 export interface User {
   _id: string;
-  address?: UserAddress;
-  email: string;
+  contact?: UserContact;
   firstName: string;
   lastName: string;
 }
 
 export interface UsersRepository {
   findAll(): Promise<WithId<Document>[]>; // TODO: why document not task?
-  findOne(email: string, username: string): Promise<WithId<Document> | null>;
-  create(credentials: User): Promise<void>;
-  updateOne(email: string, updateValue: Partial<User>): Promise<void>;
-  findByRefreshToken(token: string): Promise<WithId<Document> | null>;
+  findOne(_id: string): Promise<WithId<Document> | null>;
+  create(_id: string, userData: User): Promise<void>;
+  updateOne(_id: string, updateValue: Partial<User>): Promise<void>;
+  delete(_id: string): Promise<DeleteResult>;
 }

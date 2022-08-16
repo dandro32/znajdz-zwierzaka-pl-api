@@ -1,13 +1,14 @@
 import Joi from "joi";
 
 const UserSchema = Joi.object({
-  username: Joi.string().required().min(3).max(100),
-  email: Joi.string().email({ tlds: { allow: false } }),
-  password: Joi.string()
-    .required()
-    .min(8)
-    .max(100)
-    .regex(/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/),
+  firstName: Joi.string().required().min(2).max(100),
+  lastName: Joi.string().required().min(2).max(100),
+  contact: Joi.object({
+    city: Joi.string().required().min(2).max(100),
+    street: Joi.string().required().min(2).max(100),
+    postalCode: Joi.string().regex(/^[0-9]{2}-[0-9]{3}$/),
+    phone: Joi.string().regex(/^\+48\d{9}$/),
+  }),
 });
 
 const validateUser = (user: unknown) => {

@@ -1,12 +1,5 @@
-import bcrypt from "bcrypt";
 import { NextFunction, Request, Response } from "express";
-import jwt from "jsonwebtoken";
-
-import {
-  JWT_ACCESS_SECRET,
-  JWT_ACCESS_TOKEN_EXPIRATION,
-  JWT_REFRESH_SECRET,
-} from "../../config";
+import { RESPONSE_OK } from "../../config";
 import { StatusError } from "../../errors";
 import { withErrorHandling } from "../../middlewares";
 
@@ -23,50 +16,46 @@ const usersControllerFactory = (usersRepository: UsersRepository) =>
         next(e);
       }
     },
-    async createUser(req: Request, res: Response, next: NextFunction) {
+    async getUser(req: Request, res: Response, next: NextFunction) {
       try {
-        
-        const { username, password, email }: CreateUser = req.body;
+        const { id } = req.params;
+        const users = await usersRepository.findOne(id);
 
-        const userExists = await usersRepository.findOne(email, username);
-
-        if (userExists) {
-          throw new StatusError(`User: ${username} already exists`, 400);
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const refreshToken = generateRefreshToken(username);
-
-        await usersRepository.create({
-          username,
-          password: hashedPassword,
-          token: refreshToken,
-        });
-        const accessToken = generateAccessToken(req.body);
-
-        res.json({ username, accessToken, refreshToken });
+        res.json(users);
       } catch (e) {
         next(e);
       }
     },
-    async login(req: Request, res: Response, next: NextFunction) {
+    async createUser(req: Request, res: Response, next: NextFunction) {
       try {
-        const { username, password } = req.body;
-        const user = await usersRepository.findOne(username);
+        const { id } = req.params;
+        const userData: User = req.body;
 
-        if (!user) {
-          throw new StatusError("User does not exists. Please register", 403);
-        }
+        await usersRepository.create(id, userData);
 
-        const match = await bcrypt.compare(password, user?.password);
-        if (!match) {
-          throw new StatusError("Wrong password. Please try again", 403);
-        }
+        res.json(RESPONSE_OK);
+      } catch (e) {
+        next(e);
+      }
+    },
+    async updateUser(req: Request, res: Response, next: NextFunction) {
+      try {
+        const { id } = req.params;
+        const userData: User = req.body;
 
-        const accessToken = generateAccessToken(username);
-        const refreshToken = generateRefreshToken(username);
+        await usersRepository.updateOne(id, userData);
 
-        res.json({ username, accessToken, refreshToken });
+        res.json(RESPONSE_OK);
+      } catch (e) {
+        next(e);
+      }
+    },
+    async deleteUser(req: Request, res: Response, next: NextFunction) {
+      try {
+        const { id } = req.params;
+        await usersRepository.delete(id);
+
+        res.json(RESPONSE_OK);
       } catch (e) {
         next(e);
       }

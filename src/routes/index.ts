@@ -21,10 +21,10 @@ const usersRouteFactory = (db: Db) => {
     usersControllerFactory(usersRepository);
 
   router.get(USERS, extractJWT, getUsers);
-  router.post(USERS, extractJWT, validateUserMiddleware, createUser);
-  router.patch(USERS, extractJWT, validateUserMiddleware, updateUser);
-  router.delete(USERS, extractJWT, deleteUser);
   router.get(USER_DETAILS, extractJWT, getUser);
+  router.post(USER_DETAILS, extractJWT, validateUserMiddleware, createUser);
+  router.patch(USER_DETAILS, extractJWT, validateUserMiddleware, updateUser);
+  router.delete(USER_DETAILS, extractJWT, deleteUser);
 
   return router;
 };
