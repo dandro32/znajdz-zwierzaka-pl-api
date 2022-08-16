@@ -7,8 +7,8 @@ const usersRepositoryFactory = (db: Db): UsersRepository => {
   const users = db.collection(USERS_COLLECTION);
 
   return {
-    async findOne(email) {
-      return users.findOne({ email }, { projection: { _id: 0 } });
+    async findOne(email, username) {
+      return users.findOne({ email, username }, { projection: { _id: 0 } });
     },
     async findByRefreshToken(token) {
       return users.findOne({ token }, { projection: { _id: 0, password: 0 } });

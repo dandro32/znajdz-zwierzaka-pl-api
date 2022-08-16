@@ -1,18 +1,23 @@
 import { WithId, Document } from "mongodb";
 
-export interface CreateUser {
-  username: string;
+export interface AuthUser {
   password: string;
+  token: string;
 }
 
-export interface User extends CreateUser {
-  address?: string;
+export interface UserAddress {
   city?: string;
+  phone?: string;
+  postalCode?: string;
+  street?: string;
+}
+
+export interface User {
+  username: string;
+  address?: UserAddress;
   email: string;
   firstName: string;
   lastName: string;
-  phone?: string;
-  postalCode?: string;
   token: string;
 }
 

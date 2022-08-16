@@ -74,9 +74,9 @@ const usersControllerFactory = (usersRepository: UsersRepository) =>
     },
     async createUser(req: Request, res: Response, next: NextFunction) {
       try {
-        const { username, password }: CreateUser = req.body;
+        const { username, password, email }: CreateUser = req.body;
 
-        const userExists = await usersRepository.findOne(username);
+        const userExists = await usersRepository.findOne(email, username);
 
         if (userExists) {
           throw new StatusError(`User: ${username} already exists`, 400);
