@@ -8,21 +8,40 @@ import usersControllerFactory from "../controllers/users";
 import usersRepositoryFactory from "../controllers/users/usersRepository";
 import validateTokenMiddleWare from "../controllers/users/validateTokenMiddleWare";
 import validateUserMiddleware from "../controllers/users/validateUserMiddleware";
+import validateAuthCredentials from "../controllers/auth/validateAuthCredentials";
+import validateAuthCredentialsMiddleware from "../controllers/auth/validateAuthCredentialsMiddleware";
+import authControllerFactory from "../controllers/auth";
+import authRepositoryFactory from "../controllers/auth/authRepository";
 
 const usersRouteFactory = (db: Db) => {
-  const { USERS, LOGIN, LOGOUT, TOKEN } = routes;
+  const { USERS, USER_DETAILS } = routes;
   const router: Router = Router();
   const usersRepository = usersRepositoryFactory(db);
-  const { createUser, getUsers, login, logout, token } =
+  const { createUser, getUser, getUsers, updateUser, deleteUser } =
     usersControllerFactory(usersRepository);
 
-  router.post(TOKEN, validateTokenMiddleWare, token);
-  router.post(LOGIN, validateUserMiddleware, login);
-  router.delete(LOGOUT, extractJWT, logout);
   router.get(USERS, extractJWT, getUsers);
-  router.post(USERS, validateUserMiddleware, createUser);
+  router.post(USERS, extractJWT, validateUserMiddleware, createUser);
+  router.patch(USERS, extractJWT, validateUserMiddleware, updateUser);
+  router.delete(USERS, extractJWT, deleteUser);
+  router.get(USER_DETAILS, extractJWT, getUser);
 
   return router;
 };
 
-export { usersRouteFactory };
+const authRouteFactory = (db: Db) => {
+  const { REGISTER, LOGIN, LOGOUT, TOKEN } = routes;
+  const router: Router = Router();
+  const authRepository = authRepositoryFactory(db);
+  const { createUser, login, logout, token } =
+    authControllerFactory(authRepository);
+
+  router.post(TOKEN, validateTokenMiddleWare, token);
+  router.post(LOGIN, validateAuthCredentialsMiddleware, login);
+  router.delete(LOGOUT, extractJWT, logout);
+  router.post(REGISTER, validateAuthCredentialsMiddleware, createUser);
+
+  return router;
+};
+
+export { authRouteFactory, usersRouteFactory };

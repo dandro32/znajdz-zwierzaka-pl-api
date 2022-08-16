@@ -10,25 +10,64 @@ import {
 import { StatusError } from "../../errors";
 import { withErrorHandling } from "../../middlewares";
 
-import { User, UsersRepository } from "../../models/user";
+import { CreateUser, AuthRepository } from "../../models/auth";
 
-const usersControllerFactory = (usersRepository: UsersRepository) =>
+const generateAccessToken = (username: string): string => {
+  return jwt.sign({ username }, JWT_ACCESS_SECRET, {
+    algorithm: "HS256",
+    expiresIn: JWT_ACCESS_TOKEN_EXPIRATION,
+  });
+};
+
+const generateRefreshToken = (username: string): string => {
+  return jwt.sign({ username }, JWT_REFRESH_SECRET, {
+    algorithm: "HS256",
+  });
+};
+
+const authControllerFactory = (authRepository: AuthRepository) =>
   withErrorHandling({
-    async getUsers(_: Request, res: Response, next: NextFunction) {
+    async logout(req: Request, res: Response, next: NextFunction) {
       try {
-        const users = await usersRepository.findAll();
+        const username = req.params.username;
+        await authRepository.updateOne(username, { token: "" });
 
-        res.json(users);
+        res.sendStatus(204);
+      } catch (e) {
+        next(e);
+      }
+    },
+    async token(req: Request, res: Response, next: NextFunction) {
+      try {
+        const { refreshToken } = req.body;
+
+        const user: any = await authRepository.findByRefreshToken(
+          // TODO: handle any
+          refreshToken
+        );
+
+        if (!user) {
+          throw new StatusError("User does not exists", 403);
+        }
+
+        if (refreshToken !== user.token) {
+          throw new StatusError("Wrong refresh token.", 403);
+        }
+
+        jwt.verify(refreshToken, JWT_REFRESH_SECRET);
+
+        const accessToken = generateAccessToken(user.username);
+
+        res.json({ accessToken });
       } catch (e) {
         next(e);
       }
     },
     async createUser(req: Request, res: Response, next: NextFunction) {
       try {
-        
         const { username, password, email }: CreateUser = req.body;
 
-        const userExists = await usersRepository.findOne(email, username);
+        const userExists = await authRepository.findOne(username, email);
 
         if (userExists) {
           throw new StatusError(`User: ${username} already exists`, 400);
@@ -37,8 +76,9 @@ const usersControllerFactory = (usersRepository: UsersRepository) =>
         const hashedPassword = await bcrypt.hash(password, 10);
         const refreshToken = generateRefreshToken(username);
 
-        await usersRepository.create({
+        await authRepository.create({
           username,
+          email,
           password: hashedPassword,
           token: refreshToken,
         });
@@ -51,8 +91,8 @@ const usersControllerFactory = (usersRepository: UsersRepository) =>
     },
     async login(req: Request, res: Response, next: NextFunction) {
       try {
-        const { username, password } = req.body;
-        const user = await usersRepository.findOne(username);
+        const { username, password, email } = req.body;
+        const user = await authRepository.findOne(username);
 
         if (!user) {
           throw new StatusError("User does not exists. Please register", 403);
@@ -73,4 +113,4 @@ const usersControllerFactory = (usersRepository: UsersRepository) =>
     },
   });
 
-export default usersControllerFactory;
+export default authControllerFactory;
