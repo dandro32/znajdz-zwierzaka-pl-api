@@ -7,6 +7,8 @@ const routes: Record<string, string> = {
   USERS: "/users",
   LOSTS: "/losts",
   LOST_DETAILS: "lost/:id",
+  FOUND: "/found",
+  FOUND_DETAILS: "found/:id",
 };
 
 export default routes;

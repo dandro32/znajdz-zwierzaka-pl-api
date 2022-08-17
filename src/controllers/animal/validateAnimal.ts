@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-const LostSchema = Joi.object({
+const animalSchema = Joi.object({
   additional: Joi.string().min(2).max(1024),
   color: Joi.string().min(2).max(100),
   location: Joi.object({
@@ -13,8 +13,8 @@ const LostSchema = Joi.object({
   userId: Joi.string().required(),
 });
 
-const validateLost = (user: unknown) => {
-  const result = LostSchema.validate(user, {
+const validateAnimal = (user: unknown) => {
+  const result = animalSchema.validate(user, {
     allowUnknown: false,
     convert: true,
     abortEarly: false,
@@ -23,4 +23,4 @@ const validateLost = (user: unknown) => {
   return result?.error?.message;
 };
 
-export default validateLost;
+export default validateAnimal;

@@ -7,6 +7,7 @@ import {
   authRouteFactory,
   usersRouteFactory,
   lostsRouteFactory,
+  foundRouteFactory,
 } from "./routes";
 import { API_ROUTE } from "./config";
 
@@ -15,6 +16,7 @@ export const appFactory = (db: Db) => {
   const authRoutes = authRouteFactory(db);
   const usersRoutes = usersRouteFactory(db);
   const lostsRoutes = lostsRouteFactory(db);
+  const foundRoutes = foundRouteFactory(db);
 
   app.use(
     cors({
@@ -32,6 +34,7 @@ export const appFactory = (db: Db) => {
   app.use(API_ROUTE, authRoutes);
   app.use(API_ROUTE, usersRoutes);
   app.use(API_ROUTE, lostsRoutes);
+  app.use(API_ROUTE, foundRoutes);
 
   app.use(notFound);
   app.use(errorHandler);

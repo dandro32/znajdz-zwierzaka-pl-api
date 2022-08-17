@@ -1,9 +1,9 @@
 import { RequestHandler } from "express";
 import { StatusError } from "../../errors";
-import validateLost from "./validateLost";
+import validateAnimal from "./validateAnimal";
 
-const validateLostMiddleware: RequestHandler = (req, res, next) => {
-  const message = validateLost(req.body);
+const validateAnimalMiddleware: RequestHandler = (req, res, next) => {
+  const message = validateAnimal(req.body);
 
   if (message) {
     const error = new StatusError(message, 400);
@@ -14,4 +14,4 @@ const validateLostMiddleware: RequestHandler = (req, res, next) => {
   }
 };
 
-export default validateLostMiddleware;
+export default validateAnimalMiddleware;

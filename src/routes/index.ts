@@ -6,14 +6,16 @@ import { extractJWT } from "../middlewares";
 
 import authControllerFactory from "../controllers/auth";
 import authRepositoryFactory from "../controllers/auth/authRepository";
-import lostControllerFactory from "../controllers/lost";
-import lostsRepositoryFactory from "../controllers/lost/lostsRepository";
+import lostControllerFactory from "../controllers/animal";
+import lostsRepositoryFactory from "../controllers/animal/animalRepository";
 import usersControllerFactory from "../controllers/users";
 import usersRepositoryFactory from "../controllers/users/usersRepository";
 import validateAuthCredentialsMiddleware from "../controllers/auth/validateAuthCredentialsMiddleware";
-import validateLostMiddleware from "../controllers/lost/validateLostsMiddleware";
+import validateLostMiddleware from "../controllers/animal/validateAnimalsMiddleware";
 import validateTokenMiddleWare from "../controllers/auth/validateTokenMiddleWare";
 import validateUserMiddleware from "../controllers/users/validateUserMiddleware";
+import animalsRepositoryFactory from "../controllers/animal/animalRepository";
+import animalControllerFactory from "../controllers/animal";
 
 const usersRouteFactory = (db: Db) => {
   const { USERS, USER_DETAILS } = routes;
@@ -47,19 +49,41 @@ const authRouteFactory = (db: Db) => {
 };
 
 const lostsRouteFactory = (db: Db) => {
+  const collectionName = "zz_lost";
   const { LOSTS, LOST_DETAILS } = routes;
   const router: Router = Router();
-  const lostsRepository = lostsRepositoryFactory(db);
-  const { getLosts, getLost, createLost, updateLost, deleteLost } =
-    lostControllerFactory(lostsRepository);
+  const lostsRepository = animalsRepositoryFactory(db, collectionName);
+  const { getAnimals, getAnimal, createAnimal, updateAnimal, deleteAnimal } =
+    animalControllerFactory(lostsRepository);
 
-  router.get(LOSTS, extractJWT, getLosts);
-  router.post(LOSTS, extractJWT, validateLostMiddleware, createLost);
-  router.get(LOST_DETAILS, extractJWT, getLost);
-  router.patch(LOST_DETAILS, extractJWT, validateLostMiddleware, updateLost);
-  router.delete(LOST_DETAILS, extractJWT, deleteLost);
+  router.get(LOSTS, extractJWT, getAnimals);
+  router.post(LOSTS, extractJWT, validateLostMiddleware, createAnimal);
+  router.get(LOST_DETAILS, extractJWT, getAnimal);
+  router.patch(LOST_DETAILS, extractJWT, validateLostMiddleware, updateAnimal);
+  router.delete(LOST_DETAILS, extractJWT, deleteAnimal);
 
   return router;
 };
 
-export { authRouteFactory, usersRouteFactory, lostsRouteFactory };
+const foundRouteFactory = (db: Db) => {
+  const collectionName = "zz_found";
+  const { FOUND, FOUND_DETAILS } = routes;
+  const router: Router = Router();
+  const foundRepository = animalsRepositoryFactory(db, collectionName);
+  const { getAnimals, getAnimal, createAnimal, updateAnimal, deleteAnimal } =
+    animalControllerFactory(foundRepository);
+
+  router.get(FOUND, extractJWT, getAnimals);
+  router.post(FOUND, extractJWT, validateLostMiddleware, createAnimal);
+  router.get(FOUND_DETAILS, extractJWT, getAnimal);
+  router.patch(FOUND_DETAILS, extractJWT, validateLostMiddleware, updateAnimal);
+  router.delete(FOUND_DETAILS, extractJWT, deleteAnimal);
+  return router;
+};
+
+export {
+  authRouteFactory,
+  foundRouteFactory,
+  lostsRouteFactory,
+  usersRouteFactory,
+};

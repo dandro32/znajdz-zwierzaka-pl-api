@@ -1,6 +1,6 @@
 import { WithId, Document, DeleteResult } from "mongodb";
 
-export interface CreateLost {
+export interface CreateAnimal {
   additional?: string;
   color?: string;
   location: Location;
@@ -10,14 +10,14 @@ export interface CreateLost {
   userId: string;
 }
 
-export interface Lost extends CreateLost {
+export interface Animal extends CreateAnimal {
   _id: string;
 }
 
-export interface LostsRepository {
+export interface AnimalsRepository {
   findAll(): Promise<WithId<Document>[]>;
   findOne(_id: string): Promise<WithId<Document> | null>;
-  create(lostData: CreateLost): Promise<void>;
-  updateOne(_id: string, updateValue: Partial<Lost>): Promise<void>;
+  create(data: CreateAnimal): Promise<void>;
+  updateOne(_id: string, updateValue: Partial<Animal>): Promise<void>;
   delete(_id: string): Promise<DeleteResult>;
 }
