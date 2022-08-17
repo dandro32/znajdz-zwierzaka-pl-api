@@ -4,14 +4,16 @@ import { Db } from "mongodb";
 import routes from "./config";
 import { extractJWT } from "../middlewares";
 
-import usersControllerFactory from "../controllers/users";
-import usersRepositoryFactory from "../controllers/users/usersRepository";
-import validateTokenMiddleWare from "../controllers/users/validateTokenMiddleWare";
-import validateUserMiddleware from "../controllers/users/validateUserMiddleware";
-import validateAuthCredentials from "../controllers/auth/validateAuthCredentials";
-import validateAuthCredentialsMiddleware from "../controllers/auth/validateAuthCredentialsMiddleware";
 import authControllerFactory from "../controllers/auth";
 import authRepositoryFactory from "../controllers/auth/authRepository";
+import lostControllerFactory from "../controllers/lost";
+import lostsRepositoryFactory from "../controllers/lost/lostsRepository";
+import usersControllerFactory from "../controllers/users";
+import usersRepositoryFactory from "../controllers/users/usersRepository";
+import validateAuthCredentialsMiddleware from "../controllers/auth/validateAuthCredentialsMiddleware";
+import validateLostMiddleware from "../controllers/lost/validateLostsMiddleware";
+import validateTokenMiddleWare from "../controllers/auth/validateTokenMiddleWare";
+import validateUserMiddleware from "../controllers/users/validateUserMiddleware";
 
 const usersRouteFactory = (db: Db) => {
   const { USERS, USER_DETAILS } = routes;
@@ -44,4 +46,20 @@ const authRouteFactory = (db: Db) => {
   return router;
 };
 
-export { authRouteFactory, usersRouteFactory };
+const lostsRouteFactory = (db: Db) => {
+  const { LOSTS, LOST_DETAILS } = routes;
+  const router: Router = Router();
+  const lostsRepository = lostsRepositoryFactory(db);
+  const { getLosts, getLost, createLost, updateLost, deleteLost } =
+    lostControllerFactory(lostsRepository);
+
+  router.get(LOSTS, extractJWT, getLosts);
+  router.post(LOSTS, extractJWT, validateLostMiddleware, createLost);
+  router.get(LOST_DETAILS, extractJWT, getLost);
+  router.patch(LOST_DETAILS, extractJWT, validateLostMiddleware, updateLost);
+  router.delete(LOST_DETAILS, extractJWT, deleteLost);
+
+  return router;
+};
+
+export { authRouteFactory, usersRouteFactory, lostsRouteFactory };

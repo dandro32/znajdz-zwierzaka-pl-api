@@ -5,6 +5,8 @@ const routes: Record<string, string> = {
   TOKEN: "/token",
   USER_DETAILS: "/users/:id",
   USERS: "/users",
+  LOSTS: "/losts",
+  LOST_DETAILS: "lost/:id",
 };
 
 export default routes;
