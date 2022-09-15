@@ -92,7 +92,7 @@ const authControllerFactory = (authRepository: AuthRepository) =>
     async login(req: Request, res: Response, next: NextFunction) {
       try {
         const { username, password, email } = req.body;
-        const user = await authRepository.findOne(username);
+        const user = await authRepository.findOne(username, email);
 
         if (!user) {
           throw new StatusError("User does not exists. Please register", 403);

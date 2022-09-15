@@ -1,9 +1,10 @@
 import { WithId, Document, DeleteResult } from "mongodb";
+import { ILocation } from "./location";
 
 export interface CreateAnimal {
   additional?: string;
   color?: string;
-  location: Location;
+  location: ILocation;
   race?: string;
   title: string;
   type: string;
